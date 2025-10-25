@@ -1,0 +1,202 @@
+<?php
+session_start();
+require_once '../../config.php';
+
+if (!isset($_SESSION['username'])) {
+    header("Location: ../login.php");
+    exit;
+}
+
+if ($_SESSION['role'] !== 'Administrator') {
+    header("Location: ../login.php");
+    exit;
+}
+
+// Pastikan ada ID
+if (!isset($_GET['id'])) {
+  header("Location: ../lawyer-data/lawyer-data.php");
+  exit;
+}
+
+$id = $_GET['id'];
+
+// Ambil data lawyer
+$stmt = $pdo->prepare("SELECT l.*, u.email AS user_email, u.id AS user_id
+                       FROM lawyers l
+                       JOIN users u ON l.user_id = u.id
+                       WHERE l.id = ?");
+$stmt->execute([$id]);
+$lawyer = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$lawyer) {
+  die("Data lawyer tidak ditemukan!");
+}
+
+// Update data
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $full_name = $_POST['full_name'];
+    $email = $_POST['email'];
+    $address = $_POST['address'];
+    $birth_place = $_POST['birth_place'];
+    $birth_date = $_POST['birth_date'];
+    $profession = $_POST['profession'];
+    $phone = $_POST['phone'];
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if ($password !== $confirm_password) {
+        echo "<script>alert('Password tidak sama!');</script>";
+    } else {
+        // Update tabel lawyers
+        $stmt = $pdo->prepare("UPDATE lawyers 
+                               SET full_name=?, address=?, birth_place=?, birth_date=?, profession=?, phone=? 
+                               WHERE id=?");
+        $stmt->execute([$full_name, $address, $birth_place, $birth_date, $profession, $phone, $id]);
+
+        // Update tabel users
+        if (!empty($password)) {
+            $hashed_password = hash('sha256', $password);
+            $stmt2 = $pdo->prepare("UPDATE users SET email=?, password=? WHERE id=?");
+            $stmt2->execute([$email, $hashed_password, $lawyer['user_id']]);
+        } else {
+            $stmt2 = $pdo->prepare("UPDATE users SET email=? WHERE id=?");
+            $stmt2->execute([$email, $lawyer['user_id']]);
+        }
+
+        echo "<script>alert('Data berhasil diperbarui!'); window.location.href='./lawyer-data.php';</script>";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Lawyer Data - Three Brother Law</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-lg flex flex-col justify-between">
+      <div>
+        <div class="p-6 text-center">
+          <img src="../../assets/img/logo.png" alt="Logo" class="w-20 mx-auto mb-2">
+          <h2 class="text-lg font-bold">Three Brother Law</h2>
+        </div>
+
+        <nav class="px-4 space-y-2">
+          <a href="../admin-dashboard.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="../lawyer-data/lawyer-data.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg bg-gray-100 text-red-600 font-semibold">
+            <i class="fa-solid fa-user"></i>
+            <span>Lawyer Data</span>
+          </a>
+          <a href="../customer-data/customer-data.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-users"></i>
+            <span>Customer Data</span>
+          </a>
+          <a href="../consultation/consultation.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-file-lines"></i>
+            <span>Consultation</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-6">
+        <button onclick="window.location.href='../../logout.php'" 
+          class="w-full py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 font-semibold">
+          Log-out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+      <h1 class="text-3xl font-bold mb-6">Edit Lawyer Data</h1>
+
+      <form method="POST" action="" class="bg-white p-6 rounded-xl shadow-lg space-y-4 max-w-2xl">
+        <div>
+          <label class="block font-semibold">Name</label>
+          <input type="text" name="full_name" class="w-full px-3 py-2 border rounded" 
+                 value="<?= htmlspecialchars($lawyer['full_name']) ?>" required>
+        </div>
+        
+        <div>
+          <label class="block font-semibold">Email Address</label>
+          <input type="email" name="email" class="w-full px-3 py-2 border rounded" 
+                 value="<?= htmlspecialchars($lawyer['user_email']) ?>" required>
+        </div>
+
+        <div>
+          <label class="block font-semibold">Address</label>
+          <input type="text" name="address" class="w-full px-3 py-2 border rounded" 
+                 value="<?= htmlspecialchars($lawyer['address']) ?>">
+        </div>
+
+        <div>
+          <label class="block font-semibold">Place of Birth</label>
+          <input type="text" name="birth_place" class="w-full px-3 py-2 border rounded" 
+                 value="<?= htmlspecialchars($lawyer['birth_place']) ?>">
+        </div>
+
+        <div>
+          <label class="block font-semibold">Date of Birth</label>
+          <input type="date" name="birth_date" class="w-full px-3 py-2 border rounded" 
+                 value="<?= htmlspecialchars($lawyer['birth_date']) ?>">
+        </div>
+
+        <div>
+          <label class="block font-semibold">Lawyer Profession</label>
+          <input type="text" name="profession" class="w-full px-3 py-2 border rounded" 
+                 value="<?= htmlspecialchars($lawyer['profession']) ?>">
+        </div>
+
+        <div>
+          <label class="block font-semibold">Phone Number</label>
+          <input type="text" name="phone" class="w-full px-3 py-2 border rounded" 
+                 value="<?= htmlspecialchars($lawyer['phone']) ?>">
+        </div>
+
+        <div class="relative">
+          <label class="block font-semibold">Password</label>
+          <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded pr-10" placeholder="Isi jika ingin mengganti password">
+          <i class="fa-solid fa-eye absolute right-3 top-9 text-gray-600 cursor-pointer" onclick="togglePassword('password', this)"></i>
+        </div>
+
+        <div class="relative">
+          <label class="block font-semibold">Confirm Password</label>
+          <input type="password" name="confirm_password" id="confirmPassword" class="w-full px-3 py-2 border rounded pr-10" placeholder="Ulangi password baru">
+          <i class="fa-solid fa-eye absolute right-3 top-9 text-gray-600 cursor-pointer" onclick="togglePassword('confirmPassword', this)"></i>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-4">
+          <a href="./lwyer-data.php" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">Cancel</a>
+          <button type="submit" class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">Update</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        el.classList.remove("fa-eye");
+        el.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        el.classList.remove("fa-eye-slash");
+        el.classList.add("fa-eye");
+      }
+    }
+  </script>
+
+</body>
+</html>
