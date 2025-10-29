@@ -2,11 +2,11 @@
 session_start();
 require_once '../../config.php';
 
+// Proteksi halaman
 if (!isset($_SESSION['username'])) {
     header("Location: ../login.php");
     exit;
 }
-
 if ($_SESSION['role'] !== 'Administrator') {
     header("Location: ../login.php");
     exit;
@@ -14,14 +14,14 @@ if ($_SESSION['role'] !== 'Administrator') {
 
 // Pastikan ada ID
 if (!isset($_GET['id'])) {
-  header("Location: ../lawyer-data/lawyer-data.php");
+  header("Location: ../lawyer-data/lwyer-data.php");
   exit;
 }
 
 $id = $_GET['id'];
 
 // Ambil data lawyer
-$stmt = $pdo->prepare("SELECT l.*, u.email AS user_email, u.id AS user_id
+$stmt = $pdo->prepare("SELECT l.*, u.username, u.email AS user_email, u.id AS user_id
                        FROM lawyers l
                        JOIN users u ON l.user_id = u.id
                        WHERE l.id = ?");
@@ -35,6 +35,7 @@ if (!$lawyer) {
 // Update data
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $full_name = $_POST['full_name'];
+    $username = $_POST['username'];
     $email = $_POST['email'];
     $address = $_POST['address'];
     $birth_place = $_POST['birth_place'];
@@ -47,23 +48,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($password !== $confirm_password) {
         echo "<script>alert('Password tidak sama!');</script>";
     } else {
-        // Update tabel lawyers
-        $stmt = $pdo->prepare("UPDATE lawyers 
-                               SET full_name=?, address=?, birth_place=?, birth_date=?, profession=?, phone=? 
-                               WHERE id=?");
-        $stmt->execute([$full_name, $address, $birth_place, $birth_date, $profession, $phone, $id]);
-
-        // Update tabel users
-        if (!empty($password)) {
-            $hashed_password = hash('sha256', $password);
-            $stmt2 = $pdo->prepare("UPDATE users SET email=?, password=? WHERE id=?");
-            $stmt2->execute([$email, $hashed_password, $lawyer['user_id']]);
+        // Validasi username
+        if (!preg_match('/^[A-Za-z0-9]+$/', $username)) {
+            echo "<script>alert('Username hanya boleh berisi huruf dan angka tanpa spasi atau karakter spesial!');</script>";
         } else {
-            $stmt2 = $pdo->prepare("UPDATE users SET email=? WHERE id=?");
-            $stmt2->execute([$email, $lawyer['user_id']]);
-        }
+            // Update tabel users
+            if (!empty($password)) {
+                $hashed_password = hash('sha256', $password);
+                $stmtUser = $pdo->prepare("UPDATE users SET username=?, email=?, password=? WHERE id=?");
+                $stmtUser->execute([$username, $email, $hashed_password, $lawyer['user_id']]);
+            } else {
+                $stmtUser = $pdo->prepare("UPDATE users SET username=?, email=? WHERE id=?");
+                $stmtUser->execute([$username, $email, $lawyer['user_id']]);
+            }
 
-        echo "<script>alert('Data berhasil diperbarui!'); window.location.href='./lawyer-data.php';</script>";
+            // Update tabel lawyers
+            $stmtLawyer = $pdo->prepare("UPDATE lawyers 
+                                         SET full_name=?, email=?, address=?, birth_place=?, birth_date=?, profession=?, phone=? 
+                                         WHERE id=?");
+            $stmtLawyer->execute([$full_name, $email, $address, $birth_place, $birth_date, $profession, $phone, $id]);
+
+            echo "<script>alert('Data lawyer berhasil diperbarui!'); window.location.href='../lawyer-data/lwyer-data.php';</script>";
+        }
     }
 }
 ?>
@@ -73,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Lawyer Data - Three Brother Law</title>
+  <title>Edit Lawyer - Three Brother Law</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -93,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <i class="fa-solid fa-house"></i>
             <span>Dashboard</span>
           </a>
-          <a href="../lawyer-data/lawyer-data.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg bg-gray-100 text-red-600 font-semibold">
+          <a href="../lawyer-data/lwyer-data.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg bg-gray-100 text-red-600 font-semibold">
             <i class="fa-solid fa-user"></i>
             <span>Lawyer Data</span>
           </a>
@@ -118,65 +124,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Main Content -->
     <main class="flex-1 p-8">
-      <h1 class="text-3xl font-bold mb-6">Edit Lawyer Data</h1>
+      <h1 class="text-3xl font-bold mb-6">Edit Lawyer</h1>
 
-      <form method="POST" action="" class="bg-white p-6 rounded-xl shadow-lg space-y-4 max-w-2xl">
+      <form method="POST" class="bg-white p-6 rounded-xl shadow-lg space-y-4 max-w-2xl">
         <div>
-          <label class="block font-semibold">Name</label>
-          <input type="text" name="full_name" class="w-full px-3 py-2 border rounded" 
-                 value="<?= htmlspecialchars($lawyer['full_name']) ?>" required>
+          <label class="block font-semibold">Full Name</label>
+          <input type="text" name="full_name" value="<?= htmlspecialchars($lawyer['full_name']) ?>" required class="w-full px-3 py-2 border rounded bg-gray-200">
         </div>
-        
+
+        <div>
+          <label class="block font-semibold">Username</label>
+          <input type="text" name="username" value="<?= htmlspecialchars($lawyer['username']) ?>" required class="w-full px-3 py-2 border rounded bg-gray-200">
+        </div>
+
         <div>
           <label class="block font-semibold">Email Address</label>
-          <input type="email" name="email" class="w-full px-3 py-2 border rounded" 
-                 value="<?= htmlspecialchars($lawyer['user_email']) ?>" required>
+          <input type="email" name="email" value="<?= htmlspecialchars($lawyer['user_email']) ?>" required class="w-full px-3 py-2 border rounded bg-gray-200">
+          <p class="text-xs text-gray-500">Please use Gmail to register an account.</p>
         </div>
 
         <div>
           <label class="block font-semibold">Address</label>
-          <input type="text" name="address" class="w-full px-3 py-2 border rounded" 
-                 value="<?= htmlspecialchars($lawyer['address']) ?>">
+          <input type="text" name="address" value="<?= htmlspecialchars($lawyer['address']) ?>" class="w-full px-3 py-2 border rounded bg-gray-200">
         </div>
 
         <div>
           <label class="block font-semibold">Place of Birth</label>
-          <input type="text" name="birth_place" class="w-full px-3 py-2 border rounded" 
-                 value="<?= htmlspecialchars($lawyer['birth_place']) ?>">
+          <input type="text" name="birth_place" value="<?= htmlspecialchars($lawyer['birth_place']) ?>" class="w-full px-3 py-2 border rounded bg-gray-200">
         </div>
 
         <div>
           <label class="block font-semibold">Date of Birth</label>
-          <input type="date" name="birth_date" class="w-full px-3 py-2 border rounded" 
-                 value="<?= htmlspecialchars($lawyer['birth_date']) ?>">
+          <input type="date" name="birth_date" value="<?= htmlspecialchars($lawyer['birth_date']) ?>" class="w-full px-3 py-2 border rounded bg-gray-200">
         </div>
 
         <div>
           <label class="block font-semibold">Lawyer Profession</label>
-          <input type="text" name="profession" class="w-full px-3 py-2 border rounded" 
-                 value="<?= htmlspecialchars($lawyer['profession']) ?>">
+          <select name="profession" required class="w-full px-3 py-2 border rounded bg-gray-200">
+            <option value="" disabled>-- Pilih Profesi --</option>
+            <option value="Advokat" <?= $lawyer['profession'] === 'Advokat' ? 'selected' : '' ?>>Advokat</option>
+            <option value="Pidana" <?= $lawyer['profession'] === 'Pidana' ? 'selected' : '' ?>>Pidana</option>
+            <option value="Koorporasi" <?= $lawyer['profession'] === 'Koorporasi' ? 'selected' : '' ?>>Koorporasi</option>
+            <option value="Sengketa" <?= $lawyer['profession'] === 'Sengketa' ? 'selected' : '' ?>>Sengketa</option>
+          </select>
         </div>
 
         <div>
           <label class="block font-semibold">Phone Number</label>
-          <input type="text" name="phone" class="w-full px-3 py-2 border rounded" 
-                 value="<?= htmlspecialchars($lawyer['phone']) ?>">
+          <input type="text" name="phone" value="<?= htmlspecialchars($lawyer['phone']) ?>" class="w-full px-3 py-2 border rounded bg-gray-200">
         </div>
 
         <div class="relative">
           <label class="block font-semibold">Password</label>
-          <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded pr-10" placeholder="Isi jika ingin mengganti password">
+          <input type="password" id="password" name="password" class="w-full px-3 py-2 border rounded bg-gray-200 pr-10" placeholder="Isi jika ingin mengganti password">
           <i class="fa-solid fa-eye absolute right-3 top-9 text-gray-600 cursor-pointer" onclick="togglePassword('password', this)"></i>
         </div>
 
         <div class="relative">
           <label class="block font-semibold">Confirm Password</label>
-          <input type="password" name="confirm_password" id="confirmPassword" class="w-full px-3 py-2 border rounded pr-10" placeholder="Ulangi password baru">
+          <input type="password" id="confirmPassword" name="confirm_password" class="w-full px-3 py-2 border rounded bg-gray-200 pr-10" placeholder="Ulangi password baru">
           <i class="fa-solid fa-eye absolute right-3 top-9 text-gray-600 cursor-pointer" onclick="togglePassword('confirmPassword', this)"></i>
         </div>
 
         <div class="flex justify-end space-x-3 pt-4">
-          <a href="./lwyer-data.php" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">Cancel</a>
+          <a href="../lawyer-data/lwyer-data.php" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">Cancel</a>
           <button type="submit" class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">Update</button>
         </div>
       </form>
@@ -196,6 +207,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         el.classList.add("fa-eye");
       }
     }
+
+    // ✅ Validasi username (hanya huruf dan angka)
+    document.querySelector("form").addEventListener("submit", function(e) {
+      const username = document.querySelector("input[name='username']").value;
+      const usernamePattern = /^[A-Za-z0-9]+$/;
+      if (!usernamePattern.test(username)) {
+        e.preventDefault();
+        alert("Username hanya boleh berisi huruf dan angka tanpa spasi atau karakter spesial!");
+      }
+    });
   </script>
 
 </body>

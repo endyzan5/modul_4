@@ -72,7 +72,11 @@ if ($_SESSION['role'] !== 'Lawyer') {
     <!-- Main Content -->
     <main class="flex-1 p-12">
       <h1 class="text-3xl font-bold mb-2">Welcome Back!</h1>
-      <p class="text-xl text-gray-600 mb-10">Mr. <span class="font-semibold">Tono Sutono</span></p>
+      <p class="text-xl text-gray-600 mb-10">
+          <?php echo htmlspecialchars($_SESSION['username']); ?>
+        </span>
+      </p>
+
 
       <div class="grid md:grid-cols-3 gap-10 max-w-5xl">
         <!-- Card 1 -->

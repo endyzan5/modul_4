@@ -115,6 +115,7 @@ $professions = $stmt->fetchAll(PDO::FETCH_COLUMN);
         </div>
 
         <!-- Hidden input untuk menyimpan pilihan -->
+        <input type="hidden" name="lawyer_id" id="hiddenLawyerId">
         <input type="hidden" name="profession" id="hiddenProfession">
         <input type="hidden" name="lawyer" id="hiddenLawyer">
         <input type="hidden" name="day" id="hiddenDay">
@@ -170,6 +171,7 @@ function selectProfession(profession) {
 // setelah pilih lawyer
 function selectLawyer(lawyerName, lawyerId) {
   document.getElementById("hiddenLawyer").value = lawyerName;
+  document.getElementById("hiddenLawyerId").value = lawyerId;
   selectOption('lawyerBtn', lawyerName, 'lawyerDropdown');
 
   const dayBtn = document.getElementById("dayBtn");

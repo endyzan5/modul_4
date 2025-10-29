@@ -14,13 +14,14 @@ $lawyer_username = $_SESSION['username'];
 try {
     // Query ambil jadwal + profesi berdasarkan username
     $stmt = $pdo->prepare("
-        SELECT ls.*, l.profession
+        SELECT ls.*, l.full_name, l.profession
         FROM lawyer_schedule ls
-        JOIN users u ON ls.lawyer_username = u.username
-        JOIN lawyers l ON l.user_id = u.id
-        WHERE ls.lawyer_username = :lawyer_username
+        JOIN lawyers l ON ls.lawyer_id = l.id
+        JOIN users u ON l.user_id = u.id
+        WHERE u.username = :lawyer_username
         ORDER BY ls.id DESC
     ");
+
     $stmt->execute(['lawyer_username' => $lawyer_username]);
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -97,6 +98,7 @@ try {
         <table class="w-full text-left border-collapse">
           <thead class="bg-gray-200">
             <tr>
+              <th class="px-6 py-3 font-semibold">No</th>
               <th class="px-6 py-3 font-semibold">Lawyer Name</th>
               <th class="px-6 py-3 font-semibold">Profession</th>
               <th class="px-6 py-3 font-semibold">Day</th>
@@ -105,9 +107,10 @@ try {
             </tr>
           </thead>
           <tbody>
-          <?php foreach ($result as $row) : ?>
+          <?php foreach ($result as $index => $row) : ?>
               <tr class="border-t">
-                  <td class="px-6 py-4"><?= htmlspecialchars($row['lawyer_username']) ?></td>
+                  <td class="px-6 py-4"><?= $index + 1 ?></td>
+                  <td class="px-6 py-4"><?= htmlspecialchars($row['full_name']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['profession'] ?? '-') ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['day']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['start_time']) ?> - <?= htmlspecialchars($row['end_time']) ?></td>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 25, 2025 at 04:30 AM
+-- Generation Time: Oct 28, 2025 at 10:12 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.2.27
 
@@ -49,7 +49,10 @@ INSERT INTO `consultation_schedule` (`id`, `lawyer_id`, `customer_id`, `customer
 (1, 10, 7, 'customer1', 'Koorporasi', 'lawyersatu', '2025-10-16', 'Senin', '08.00 - 10.00', 'Accepted', '2025-10-16 11:42:55'),
 (2, 11, 7, 'customer1', 'Advokat', 'lawyerdua', '2025-10-16', 'Selasa', '08.00 - 15.00', 'Pending', '2025-10-16 11:48:16'),
 (3, 10, 7, 'customer1', 'Koorporasi', 'lawyersatu', '2025-10-18', 'Senin', '08.00 - 10.00', 'Pending', '2025-10-18 07:39:52'),
-(4, 11, 7, 'customer1', 'Advokat', 'lawyerdua', '2025-10-18', 'Selasa', '08.00 - 15.00', 'Pending', '2025-10-18 07:41:56');
+(4, 11, 7, 'customer1', 'Advokat', 'lawyerdua', '2025-10-18', 'Selasa', '08.00 - 15.00', 'Pending', '2025-10-18 07:41:56'),
+(5, NULL, NULL, 'customer1', 'Advokat', 'Dr. Arara, S.H., LL.M., M.Hum', '2025-10-28', 'Rabu', '08.00 - 17.00', 'Pending', '2025-10-28 07:32:53'),
+(6, 13, 7, 'customer1', 'Advokat', 'Dr. Arara, S.H., LL.M., M.Hum', '2025-10-28', 'Rabu', '08.00 - 17.00', 'Accepted', '2025-10-28 07:55:22'),
+(7, 10, 7, 'customer1', 'Pidana', 'Umam, S.H.', '2025-10-28', 'Senin', '08.00 - 10.00', 'Pending', '2025-10-28 08:10:53');
 
 -- --------------------------------------------------------
 
@@ -76,8 +79,10 @@ CREATE TABLE `lawyers` (
 --
 
 INSERT INTO `lawyers` (`id`, `user_id`, `full_name`, `email`, `address`, `birth_place`, `birth_date`, `profession`, `phone`, `created_at`, `updated_at`) VALUES
-(10, 24, 'lawyersatu', 'lawyersatu@gmail.com', 'jalan ku aman', 'Sidoarjo', '2025-10-01', 'Koorporasi', '08891231231', '2025-10-16 09:16:27', '2025-10-16 12:50:04'),
-(11, 28, 'lawyerdua', 'lawyerdua@gmail.com', 'jalan nya', 'Sidoarjo', '2023-05-08', 'Advokat', '08891231231', '2025-10-16 09:35:44', '2025-10-16 09:35:44');
+(10, 24, 'Umam, S.H.', 'lawyersatu@gmail.com', 'jalan ku aman', 'Sidoarjo', '2025-10-01', 'Pidana', '08891231231', '2025-10-16 09:16:27', '2025-10-27 11:09:31'),
+(11, 28, 'lawyerdua', 'lawyerdua@gmail.com', 'jalan nya', 'Sidoarjo', '2023-05-08', 'Sengketa', '08891231231', '2025-10-16 09:35:44', '2025-10-27 11:09:44'),
+(13, 30, 'Dr. Arara, S.H., LL.M., M.Hum', 'arara@gmail.com', 'jalan yok', 'Sidoarjo', '2013-06-03', 'Advokat', '08891231231', '2025-10-28 05:14:11', '2025-10-28 05:14:11'),
+(14, 31, 'Andi, S.H.', 'andilawyer@gmail.com', 'jalan nya', 'Sidoarjo', '2025-10-04', 'Sengketa', '08891231231', '2025-10-28 07:11:53', '2025-10-28 07:11:53');
 
 -- --------------------------------------------------------
 
@@ -103,7 +108,8 @@ INSERT INTO `lawyer_schedule` (`id`, `lawyer_id`, `lawyer_username`, `day`, `sta
 (2, 10, 'lawyersatu', 'Senin', '08.00', '10.00', '2025-10-16 09:19:34'),
 (3, 11, 'lawyerdua', 'Selasa', '08.00', '15.00', '2025-10-16 09:36:14'),
 (4, 11, 'lawyerdua', 'Rabu', '13.00', '15.00', '2025-10-16 09:36:26'),
-(5, NULL, 'lawyersatu', 'Senin', '08.00', '10.00', '2025-10-19 10:49:49');
+(5, NULL, 'lawyersatu', 'Senin', '08.00', '10.00', '2025-10-19 10:49:49'),
+(8, 13, 'araralawyer', 'Rabu', '08.00', '17.00', '2025-10-28 07:01:47');
 
 -- --------------------------------------------------------
 
@@ -134,7 +140,9 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `profile_picture`, `
 (8, 'lawyer1', 'lawyer1@gmail.com', '$2y$10$w56xhjNjgOQYPJWswoS4SOXh2ZSxfpDhY03GSdpSPUJaV1mjpHf8G', NULL, 'Customer', '2025-10-12 19:40:17', '2025-10-12 19:40:17'),
 (24, 'lawyersatu', 'lawyersatu@gmail.com', '46d5f4cae495902d83337bab4b0cd988a0fdb2a319bacbcc7cf1e2c6802cdc4e', 'assets/uploads/profiles/1761365677_pp amba 1.jpeg', 'Lawyer', '2025-10-16 09:16:27', '2025-10-25 04:14:37'),
 (27, 'adminsatu', 'adminsatu@gmail.com', '9998da720208ae7867889484c5a201a2011715277d50e6a5483e216f1c1bb25f', NULL, 'Administrator', '2025-10-16 09:24:20', '2025-10-16 09:24:20'),
-(28, 'lawyerdua', 'lawyerdua@gmail.com', '24e6cbd0241ac425fee9e67ff9e43bdb95b292f4e684d1e3cee3f898e174d1b3', NULL, 'Lawyer', '2025-10-16 09:35:44', '2025-10-16 09:35:44');
+(28, 'lawyerdua', 'lawyerdua@gmail.com', '24e6cbd0241ac425fee9e67ff9e43bdb95b292f4e684d1e3cee3f898e174d1b3', NULL, 'Lawyer', '2025-10-16 09:35:44', '2025-10-16 09:35:44'),
+(30, 'araralawyer', 'arara@gmail.com', 'b6676117729a48ca5b1324a13fbf5eb6657d26f8b7dcf1931f33f52e4e9e11ed', NULL, 'Lawyer', '2025-10-28 05:14:11', '2025-10-28 05:14:11'),
+(31, 'andilawyer', 'andilawyer@gmail.com', '180348f5b22db17be014d5c1cb8151c858267cb44819e5460a7ae2528b91680e', NULL, 'Lawyer', '2025-10-28 07:11:53', '2025-10-28 07:11:53');
 
 --
 -- Indexes for dumped tables
@@ -178,25 +186,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `consultation_schedule`
 --
 ALTER TABLE `consultation_schedule`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `lawyers`
 --
 ALTER TABLE `lawyers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `lawyer_schedule`
 --
 ALTER TABLE `lawyer_schedule`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Constraints for dumped tables

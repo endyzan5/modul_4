@@ -174,7 +174,7 @@ $profile_picture = !empty($lawyer['profile_picture'])
             <i class="fa-solid fa-house"></i>
             <span>Dashboard</span>
           </a>
-          <a href="../lawyer-schedule/lawyer-schedule.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-gray-100">
+          <a href="../lawyer-schadule/lawyer-schedule.php" class="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-gray-100">
             <i class="fa-regular fa-calendar"></i>
             <span>Lawyer Schedule</span>
           </a>

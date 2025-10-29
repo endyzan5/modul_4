@@ -9,16 +9,16 @@ if (!isset($_SESSION['username'])) {
 }
 
 try {
-    // Ambil data jadwal lawyer beserta profesinya
+    // Ambil data jadwal lawyer beserta nama lengkap dan profesinya
     $stmt = $pdo->query("
         SELECT 
-            ls.lawyer_username, 
+            l.full_name AS lawyer_name,
             l.profession,
             ls.day, 
             ls.start_time, 
             ls.end_time
         FROM lawyer_schedule ls
-        JOIN lawyers l ON l.full_name = ls.lawyer_username
+        JOIN lawyers l ON ls.lawyer_id = l.id
         ORDER BY ls.id DESC
     ");
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -93,6 +93,7 @@ try {
         <table class="w-full text-left border-collapse">
           <thead class="bg-gray-200">
             <tr>
+              <th class="px-6 py-3">No</th>
               <th class="px-6 py-3 font-semibold">Lawyer Name</th>
               <th class="px-6 py-3 font-semibold">Profession</th>
               <th class="px-6 py-3 font-semibold">Day</th>
@@ -101,9 +102,10 @@ try {
           </thead>
           <tbody>
         <?php if (count($result) > 0): ?>
-            <?php foreach ($result as $row): ?>
+            <?php foreach ($result as $index => $row): ?>
                 <tr class="border-t">
-                    <td class="px-6 py-4"><?= htmlspecialchars($row['lawyer_username']) ?></td>
+                    <td class="px-6 py-4"><?= $index + 1 ?></td>
+                    <td class="px-6 py-4"><?= htmlspecialchars($row['lawyer_name']) ?></td>
                     <td class="px-6 py-4"><?= htmlspecialchars($row['profession']) ?></td>
                     <td class="px-6 py-4"><?= htmlspecialchars($row['day']) ?></td>
                     <td class="px-6 py-4"><?= htmlspecialchars($row['start_time']) ?> - <?= htmlspecialchars($row['end_time']) ?></td>
@@ -117,26 +119,6 @@ try {
           </tbody>
         </table>
       </div>
-
-      <!-- Pagination -->
-      <!-- <div class="flex items-center justify-between mt-6">
-        <button class="flex items-center px-3 py-1 text-sm bg-black text-white rounded hover:opacity-80">
-          <span class="mr-1">&lt;</span> Previous
-        </button>
-
-        <div class="flex items-center space-x-2 text-gray-700">
-          <span class="px-3 py-1 rounded bg-black text-white text-sm">1</span>
-          <span class="px-2">2</span>
-          <span class="px-2">3</span>
-          <span class="px-2">...</span>
-          <span class="px-2">67</span>
-          <span class="px-2">68</span>
-        </div>
-
-        <button class="flex items-center px-3 py-1 text-sm bg-black text-white rounded hover:opacity-80">
-          Next <span class="ml-1">&gt;</span>
-        </button>
-      </div> -->
     </main>
   </div>
 

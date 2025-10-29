@@ -84,7 +84,7 @@ $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <table class="w-full text-left border-collapse">
           <thead class="bg-gray-200">
             <tr>
-              <th class="py-3 px-4">#</th>
+              <th class="py-3 px-4">No</th>
               <th class="py-3 px-4">Username</th>
               <th class="py-3 px-4">Email</th>
               <th class="py-3 px-4">Created At</th>

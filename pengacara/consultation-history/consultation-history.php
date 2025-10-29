@@ -9,8 +9,21 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Lawyer') {
 }
 
 try {
-  // Ambil semua jadwal konsultasi dari database
-  $stmt = $pdo->query("SELECT * FROM consultation_schedule ORDER BY created_at ASC");
+  // Ambil jadwal konsultasi + nama lawyer dari tabel lawyers
+  $stmt = $pdo->query("
+    SELECT 
+      cs.id,
+      cs.customer_name,
+      cs.profession,
+      l.full_name AS lawyer_full_name,
+      cs.consultation_date,
+      cs.day,
+      cs.time,
+      cs.status
+    FROM consultation_schedule cs
+    LEFT JOIN lawyers l ON cs.lawyer_id = l.id
+    ORDER BY cs.created_at DESC
+  ");
   $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
@@ -83,7 +96,7 @@ try {
         <table class="w-full text-left border-collapse">
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-6 py-3 font-semibold">ID</th>
+              <th class="px-6 py-3 font-semibold">No</th>
               <th class="px-6 py-3 font-semibold">Customer Name</th>
               <th class="px-6 py-3 font-semibold">Profession</th>
               <th class="px-6 py-3 font-semibold">Lawyer</th>
@@ -95,7 +108,7 @@ try {
           </thead>
           <tbody>
             <?php if (count($consultations) > 0): ?>
-              <?php foreach ($consultations as $row): ?>
+              <?php $no = 1; foreach ($consultations as $row): ?>
                 <?php
                   $statusClass = match($row['status']) {
                     'Accepted' => 'bg-green-500 text-white',
@@ -104,10 +117,10 @@ try {
                   };
                 ?>
                 <tr class="border-t hover:bg-gray-50">
-                  <td class="px-6 py-4"><?= htmlspecialchars($row['id']) ?></td>
+                  <td class="px-6 py-4"><?= $no++ ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['customer_name']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['profession']) ?></td>
-                  <td class="px-6 py-4"><?= htmlspecialchars($row['lawyer_name']) ?></td>
+                  <td class="px-6 py-4"><?= htmlspecialchars($row['lawyer_full_name'] ?? '-') ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['consultation_date']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['day']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['time']) ?></td>

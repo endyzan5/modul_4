@@ -8,15 +8,36 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Lawyer') {
     exit;
 }
 
-// Ambil semua data konsultasi berdasarkan nama lawyer login
-$stmt = $pdo->prepare("
-    SELECT id, customer_name, consultation_date, day, time, status 
-    FROM consultation_schedule 
-    WHERE lawyer_name = :lawyer_name 
-    ORDER BY id DESC
-");
-$stmt->execute(['lawyer_name' => $_SESSION['username']]);
-$consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    // Ambil ID lawyer berdasarkan username user yang sedang login
+    $stmt = $pdo->prepare("
+        SELECT l.id 
+        FROM lawyers l
+        JOIN users u ON l.user_id = u.id
+        WHERE u.username = :username
+    ");
+    $stmt->execute(['username' => $_SESSION['username']]);
+    $lawyer = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$lawyer) {
+        die('Lawyer data not found for this user.');
+    }
+
+    $lawyer_id = $lawyer['id'];
+
+    // Ambil semua data konsultasi berdasarkan ID lawyer
+    $stmt = $pdo->prepare("
+        SELECT id, customer_name, consultation_date, day, time, status 
+        FROM consultation_schedule 
+        WHERE lawyer_id = :lawyer_id 
+        ORDER BY id DESC
+    ");
+    $stmt->execute(['lawyer_id' => $lawyer_id]);
+    $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -84,7 +105,7 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <table class="w-full text-left border-collapse">
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-6 py-3 font-semibold">ID</th>
+              <th class="px-6 py-3 font-semibold">No</th>
               <th class="px-6 py-3 font-semibold">Customer Name</th>
               <th class="px-6 py-3 font-semibold">Date</th>
               <th class="px-6 py-3 font-semibold">Day</th>
@@ -95,9 +116,9 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </thead>
           <tbody>
             <?php if (count($consultations) > 0): ?>
-              <?php foreach ($consultations as $row): ?>
+              <?php foreach ($consultations as $index => $row): ?>
                 <tr class="border-t hover:bg-gray-50">
-                  <td class="px-6 py-4"><?= htmlspecialchars($row['id']) ?></td>
+                  <td class="px-6 py-4"><?= $index + 1 ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['customer_name']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['consultation_date']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['day']) ?></td>

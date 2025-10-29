@@ -15,6 +15,7 @@ if ($_SESSION['role'] !== 'Administrator') {
 // Jika form disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $full_name = $_POST['full_name'];
+    $username = $_POST['username'];
     $email = $_POST['email'];
     $address = $_POST['address'];
     $birth_place = $_POST['birth_place'];
@@ -27,23 +28,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($password !== $confirm_password) {
         echo "<script>alert('Password tidak sama!');</script>";
     } else {
-        // Buat username otomatis dari nama
-        $username = strtolower(str_replace(' ', '', $full_name)); 
         $hashed_password = hash('sha256', $password);
 
         // Cek apakah username atau email sudah terdaftar
-        $stmt_check = $pdo->prepare("SELECT username, email FROM users WHERE username = ? OR email = ?");
-        $stmt_check->execute([$username, $email]);
+        // Cek apakah username, email, atau full_name sudah terdaftar
+        $stmt_check = $pdo->prepare("
+            SELECT 
+                u.username, 
+                u.email, 
+                l.full_name 
+            FROM users u 
+            LEFT JOIN lawyers l ON u.id = l.user_id 
+            WHERE u.username = ? OR u.email = ? OR l.full_name = ?
+        ");
+        $stmt_check->execute([$username, $email, $full_name]);
         $existing = $stmt_check->fetch(PDO::FETCH_ASSOC);
 
         if ($existing) {
-            // Jika username atau email sudah ada
-            if ($existing['username'] === $username && $existing['email'] === $email) {
-                echo "<script>alert('Username dan Email sudah digunakan! Silakan gunakan yang lain.');</script>";
+            if ($existing['username'] === $username && $existing['email'] === $email && $existing['full_name'] === $full_name) {
+                echo "<script>alert('Full Name, Username, dan Email sudah digunakan!');</script>";
+            } elseif ($existing['username'] === $username && $existing['email'] === $email) {
+                echo "<script>alert('Username dan Email sudah digunakan!');</script>";
+            } elseif ($existing['username'] === $username && $existing['full_name'] === $full_name) {
+                echo "<script>alert('Username dan Full Name sudah digunakan!');</script>";
+            } elseif ($existing['email'] === $email && $existing['full_name'] === $full_name) {
+                echo "<script>alert('Email dan Full Name sudah digunakan!');</script>";
             } elseif ($existing['username'] === $username) {
-                echo "<script>alert('Username sudah digunakan! Silakan pilih nama lain.');</script>";
-            } else {
-                echo "<script>alert('Email sudah digunakan! Silakan gunakan email lain.');</script>";
+                echo "<script>alert('Username sudah digunakan!');</script>";
+            } elseif ($existing['email'] === $email) {
+                echo "<script>alert('Email sudah digunakan!');</script>";
+            } elseif ($existing['full_name'] === $full_name) {
+                echo "<script>alert('Full Name sudah digunakan!');</script>";
             }
         } else {
             // Tambahkan user ke tabel users
@@ -59,9 +74,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             echo "<script>alert('Data lawyer berhasil ditambahkan!'); window.location.href='../lawyer-data/lwyer-data.php';</script>";
         }
+
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -119,6 +134,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div>
           <label class="block font-semibold">Full Name</label>
           <input type="text" name="full_name" required class="w-full px-3 py-2 border rounded bg-gray-200">
+        </div>
+
+        <div>
+          <label class="block font-semibold">Username</label>
+          <input type="text" name="username" required class="w-full px-3 py-2 border rounded bg-gray-200">
         </div>
         
         <div>
@@ -192,6 +212,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
     }
   </script>
+  <script>
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        el.classList.remove("fa-eye");
+        el.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        el.classList.remove("fa-eye-slash");
+        el.classList.add("fa-eye");
+      }
+    }
+
+    // ✅ Validasi username agar hanya huruf dan angka
+    document.querySelector("form").addEventListener("submit", function (e) {
+      const username = document.querySelector("input[name='username']").value;
+      const usernamePattern = /^[A-Za-z0-9]+$/; // hanya huruf dan angka
+
+      if (!usernamePattern.test(username)) {
+        e.preventDefault(); // hentikan pengiriman form
+        alert("Username hanya boleh berisi huruf dan angka tanpa spasi atau karakter spesial!");
+      }
+    });
+  </script>
+
 
 </body>
 </html>

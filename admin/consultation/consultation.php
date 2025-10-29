@@ -8,8 +8,18 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Administrator') {
     exit;
 }
 
-// Ambil semua data dari tabel consultation_schedule
-$stmt = $pdo->query("SELECT customer_name, consultation_date, lawyer_name, profession, day, time FROM consultation_schedule ORDER BY consultation_date DESC");
+$stmt = $pdo->query("
+  SELECT 
+    c.customer_name,
+    c.consultation_date,
+    COALESCE(l.full_name, c.lawyer_name) AS lawyer_name,
+    COALESCE(l.profession, c.profession) AS profession,
+    c.day,
+    c.time
+  FROM consultation_schedule c
+  LEFT JOIN lawyers l ON c.lawyer_id = l.id
+  ORDER BY c.consultation_date DESC
+");
 $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -65,35 +75,37 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <main class="flex-1 p-8">
       <h1 class="text-3xl font-bold mb-6">Consultation Schedule</h1>
 
-      <div class="bg-white p-6 rounded-2xl shadow-lg">
-        <table class="w-full table-auto border-collapse">
-          <thead>
-            <tr class="bg-gray-200 text-gray-700">
-              <th class="px-4 py-3 text-left rounded-tl-lg">Customer Name</th>
-              <th class="px-4 py-3 text-left">Consule Date</th>
-              <th class="px-4 py-3 text-left">Lawyer</th>
-              <th class="px-4 py-3 text-left">Profession</th>
-              <th class="px-4 py-3 text-left">Day</th>
-              <th class="px-4 py-3 text-left rounded-tr-lg">Time</th>
+      <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-200">
+            <tr>
+              <th class="py-3 px-4">No</th>
+              <th class="py-3 px-4">Customer Name</th>
+              <th class="py-3 px-4">Consultation Date</th>
+              <th class="py-3 px-4">Lawyer</th>
+              <th class="py-3 px-4">Profession</th>
+              <th class="py-3 px-4">Day</th>
+              <th class="py-3 px-4">Time</th>
             </tr>
           </thead>
-          <tbody class="text-gray-800">
+          <tbody>
             <?php if (count($consultations) > 0): ?>
-              <?php foreach ($consultations as $row): ?>
+              <?php foreach ($consultations as $index => $row): ?>
                 <tr class="border-b hover:bg-gray-50">
-                  <td class="px-4 py-3"><?= htmlspecialchars($row['customer_name']) ?></td>
-                  <td class="px-4 py-3"><?= htmlspecialchars(date("d F Y", strtotime($row['consultation_date']))) ?></td>
-                  <td class="px-4 py-3"><?= htmlspecialchars($row['lawyer_name']) ?></td>
-                  <td class="px-4 py-3"><?= htmlspecialchars($row['profession']) ?></td>
-                  <td class="px-4 py-3"><?= htmlspecialchars($row['day']) ?></td>
-                  <td class="px-4 py-3"><?= htmlspecialchars($row['time']) ?></td>
+                  <td class="py-3 px-4"><?= $index + 1 ?></td>
+                  <td class="py-3 px-4"><?= htmlspecialchars((string)($row['customer_name'] ?? '')) ?></td>
+                  <td class="py-3 px-4">
+                    <?= htmlspecialchars((string)(!empty($row['consultation_date']) ? date("d F Y", strtotime($row['consultation_date'])) : '')) ?>
+                  </td>
+                  <td class="py-3 px-4"><?= htmlspecialchars((string)($row['lawyer_name'] ?? '')) ?></td>
+                  <td class="py-3 px-4"><?= htmlspecialchars((string)($row['profession'] ?? '')) ?></td>
+                  <td class="py-3 px-4"><?= htmlspecialchars((string)($row['day'] ?? '')) ?></td>
+                  <td class="py-3 px-4"><?= htmlspecialchars((string)($row['time'] ?? '')) ?></td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="6" class="px-4 py-6 text-center text-gray-500">
-                  No consultation data available.
-                </td>
+                <td colspan="7" class="py-4 text-center text-gray-500">No consultation data available.</td>
               </tr>
             <?php endif; ?>
           </tbody>

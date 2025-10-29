@@ -4,9 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Three Brother Law</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="./assets/img/banner.webp" fetchpriority="high">
+  <link rel="stylesheet" href="./public/output.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CSS utama -->
+  <link rel="preload" href="./public/output.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="./public/output.css"></noscript>
+  <!-- Font Awesome -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+
   <style>
+    body { font-family: sans-serif; background-color: #fff; color: #333; margin:0; }
+	  header { position:fixed; top:0; width:100%; background:#fff; z-index:50; }
+	  .hero { min-height:600px; display:flex; align-items:center; justify-content:center; }
+    /* Animasi Hero */
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -20,41 +36,130 @@
     .animate-fade-in-up {
       animation: fadeInUp 1s ease-out forwards;
     }
+
+    /* 🔧 Responsif Khusus untuk HP ≤ 400px */
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 1.8rem; /* ~29px */
+        line-height: 2.2rem;
+      }
+      h2 {
+        font-size: 1.25rem; /* ~20px */
+      }
+      p {
+        font-size: 0.9rem;
+        line-height: 1.4rem;
+      }
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .hero-buttons a {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.75rem;
+      }
+      nav a {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      .w-28 {
+        width: 5rem !important;
+        height: 4.5rem !important;
+      }
+    }
+    /* 🔧 Responsif tambahan untuk layar 401px - 430px */
+    @media (max-width: 430px) {
+      .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem; /* jarak antar tombol */
+      }
+
+      .hero-buttons a {
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+        display: block;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+    @font-face {
+      font-family: 'Font Awesome 6 Free';
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Font Awesome 6 Brands';
+      font-display: swap;
+    }
+
   </style>
 </head>
 <body class="font-sans bg-white text-gray-800">
 
-    <!-- Navbar -->
+  <!-- Navbar -->
   <header class="fixed w-full bg-white shadow z-50">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <!-- Logo -->
       <div class="flex items-center space-x-2">
-        <a href="index.html">
-          <img src="./assets/img/logo.png" alt="Logo" class="w-10 h-10">
+        <a href="index.php" class="flex items-center space-x-2">
+          <img src="./assets/img/logo.webp" alt="Logo Three Brother Law" class="w-10 h-10">
         </a>
       </div>
-      <nav class="space-x-6 hidden md:flex text-gray-700">
-        <a href="index.html#about" class="hover:text-gray-900">Tentang Kami</a>
-        <a href="index.html#services" class="hover:text-gray-900">Layanan</a>
-        <a href="index.html#testimony" class="hover:text-gray-900">Testimoni</a>
-        <a href="index.html#location" class="hover:text-gray-900">Lokasi</a>
-        <a href="index.html#contact" class="hover:text-gray-900">Kontak</a>
+
+      <!-- Menu -->
+      <nav
+        id="menu"
+        class="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center space-y-4 py-4 transform scale-y-0 origin-top transition-transform duration-300 md:transform-none md:scale-y-100 md:flex md:flex-row md:space-y-0 md:space-x-6 md:static md:bg-transparent md:shadow-none md:justify-center flex-1"
+      >
+        <a href="#about" class="py-2 px-6 hover:text-gray-900 transition">Tentang Kami</a>
+        <a href="#services" class="py-2 px-6 hover:text-gray-900 transition">Layanan</a>
+        <a href="#testimony" class="py-2 px-6 hover:text-gray-900 transition">Testimoni</a>
+        <a href="#contact" class="py-2 px-6 hover:text-gray-900 transition">Lokasi</a>
+        <a href="#contact" class="py-2 px-6 hover:text-gray-900 transition">Kontak</a>
+
+        <!-- Tombol login/daftar di mobile -->
+        <div class="flex flex-col space-y-2 md:hidden w-4/5 text-center">
+          <a href="login.php" class="px-4 py-2 border rounded hover:bg-gray-100 transition">Masuk</a>
+          <a href="register.php" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition">Daftar</a>
+        </div>
       </nav>
-      <div class="space-x-3">
-        <a href="login.php" class="px-4 py-2 border rounded hover:bg-gray-100">Masuk</a>
-        <a href="register.php" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">Daftar</a>
+
+      <!-- Tombol hamburger -->
+      <button id="menu-btn" aria-label="Buka menu navigasi" class="md:hidden text-2xl focus:outline-none transition-transform duration-300">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+
+      <!-- Tombol login/daftar di desktop -->
+      <div class="hidden md:flex space-x-3">
+        <a href="login.php" class="px-4 py-2 border rounded hover:bg-gray-100 transition">Masuk</a>
+        <a href="register.php" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition">Daftar</a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section yang Diperbarui -->
-  <section class="relative min-h-[600px] flex items-center justify-center bg-cover bg-center bg-fixed" style="background-image: url('./assets/img/banner.png');">
+  <!-- Hero Section -->
+  <section class="relative min-h-[600px] flex items-center justify-center bg-cover bg-center bg-fixed" style="background-image: url('./assets/img/banner.webp');" fetchpriority="high">
     <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40"></div>
     <div class="relative z-10 text-center text-white container mx-auto px-6">
       <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in-up">Three Brother Law</h1>
-      <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.3s;">
+      <p class="text-lg md:text-2xl mb-8 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.3s;">
         Firma Hukum & Layanan Pengacara Profesional untuk Perlindungan Hukum Terbaik Anda
       </p>
-      <div class="animate-fade-in-up" style="animation-delay: 0.6s;">
+      <div class="animate-fade-in-up hero-buttons" style="animation-delay: 0.6s;">
         <a href="#contact" class="inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-300 mr-4">
           Konsultasi Gratis
         </a>
@@ -63,7 +168,7 @@
         </a>
       </div>
     </div>
-    
+
     <!-- Scroll indicator -->
     <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
       <a href="#about" class="text-white text-2xl">
@@ -72,18 +177,18 @@
     </div>
   </section>
 
-  <!-- 2 img Section -->
+  <!-- 2 Gambar Section -->
   <section class="py-12 px-6 container mx-auto">
     <h2 class="text-2xl font-bold mb-8 text-center">Mengapa Memilih Kami?</h2>
     <div class="grid md:grid-cols-2 gap-6">
       <div class="relative">
-        <img src="./assets/img/imgwelcome1.png" alt="Pertemuan pengacara" class="w-full h-[300px] object-cover rounded-xl shadow">
+        <img src="./assets/img/imgwelcome1.webp" alt="Pertemuan pengacara" class="w-full h-[300px] object-cover rounded-xl shadow">
         <div class="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
           <p class="text-white font-semibold text-lg">Diskusi Kasus</p>
         </div>
       </div>
       <div class="relative">
-        <img src="./assets/img/imgwelcome2.png" alt="Diskusi pengadilan" class="w-full h-[300px] object-cover rounded-xl shadow">
+        <img src="./assets/img/imgwelcome2.webp" alt="Diskusi pengadilan" class="w-full h-[300px] object-cover rounded-xl shadow">
         <div class="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
           <p class="text-white font-semibold text-lg">Solusi Hukum Terbaik</p>
         </div>
@@ -91,15 +196,13 @@
     </div>
   </section>
 
-
-  <!-- About Us -->
+  <!-- About -->
   <section id="about" class="py-20 px-6 container mx-auto">
-    <h2 class="text-2xl font-bold mb-6">Tentang kami</h2>
+    <h2 class="text-2xl font-bold mb-6">Tentang Kami</h2>
     <p class="text-gray-700 leading-relaxed text-justify">
-      Three Brother Law adalah firma hukum yang didedikasikan berdasarkan prinsip integritas, profesionalisme, dan komitmen yang teguh terhadap keadilan. 
-      Didirikan oleh tiga bersaudara dengan keahlian hukum yang beragam, firma ini menyediakan layanan hukum komprehensif yang mencakup masalah hukum perdata, pidana, korporat, dan keluarga. 
-      Dengan pendekatan yang berpusat pada klien, Three Brother Law menekankan komunikasi yang jelas, strategi yang disesuaikan, dan solusi praktis untuk memenuhi kebutuhan unik individu, bisnis, dan organisasi. 
-      Dipandu oleh nilai-nilai etika yang kuat dan semangat advokasi, firma ini berusaha untuk melindungi hak-hak klien, menyelesaikan sengketa secara efektif, dan memberikan hasil dengan standar keunggulan tertinggi.
+      Three Brother Law adalah firma hukum yang didedikasikan berdasarkan prinsip integritas, profesionalisme, dan komitmen terhadap keadilan.
+      Didirikan oleh tiga bersaudara dengan keahlian hukum beragam, kami menyediakan layanan hukum komprehensif meliputi perdata, pidana, korporat, dan keluarga.
+      Dengan pendekatan berpusat pada klien, kami menekankan komunikasi jelas, strategi disesuaikan, dan solusi praktis untuk memenuhi kebutuhan unik Anda.
     </p>
   </section>
 
@@ -109,29 +212,28 @@
       <h2 class="text-2xl font-bold mb-3">Layanan Kami</h2>
       <p class="mb-10 text-gray-600">Layanan kami hadir dengan harga yang wajar</p>
       <div class="space-y-6">
-        <!-- Card -->
         <div class="flex items-center bg-white p-4 rounded-xl border">
-          <img src="./assets/img/service1.jpg" class="w-28 h-24 rounded mr-6 object-cover" alt="">
+          <img src="./assets/img/service1.webp" loading="lazy" class="w-28 h-24 rounded mr-6 object-cover" alt="layanan pertama dari three brother law">
           <div>
-            <h3 class="text-lg font-semibold">Pengajuan perceraian.</h3>
-            <p class="text-gray-600">Membantu klien dalam mengajukan permohonan perceraian dan mewakili mereka di pengadilan.</p>
-            <a href="register.html" class="mt-2 px-3 py-1 border rounded hover:bg-gray-100">Klik Di Sini</a>
+            <h3 class="text-lg font-semibold">Pengajuan Perceraian</h3>
+            <p class="text-gray-600">Membantu klien dalam pengajuan perceraian dan mewakili di pengadilan.</p>
+            <a href="register.php" class="mt-2 px-3 py-1 border rounded hover:bg-gray-100 inline-block">Klik Di Sini</a>
           </div>
         </div>
         <div class="flex items-center bg-white p-4 rounded-xl border">
-          <img src="./assets/img/service2.jpg" class="w-28 h-24 rounded mr-6 object-cover" alt="">
+          <img src="./assets/img/service2.webp" loading="lazy" class="w-28 h-24 rounded mr-6 object-cover" alt="layanan kedua dari three brother law">
           <div>
-            <h3 class="text-lg font-semibold">Sengketa tanah atau pembagian properti.</h3>
-            <p class="text-gray-600">Menangani konflik terkait kepemilikan tanah, batas wilayah, atau warisan.</p>
-            <a href="register.html" class="mt-2 px-3 py-1 border rounded hover:bg-gray-100">Klik Di Sini</a>
+            <h3 class="text-lg font-semibold">Sengketa Tanah & Properti</h3>
+            <p class="text-gray-600">Menangani konflik kepemilikan tanah, batas wilayah, atau warisan.</p>
+            <a href="register.php" class="mt-2 px-3 py-1 border rounded hover:bg-gray-100 inline-block">Klik Di Sini</a>
           </div>
         </div>
         <div class="flex items-center bg-white p-4 rounded-xl border">
-          <img src="./assets/img/service3.png" class="w-28 h-24 rounded mr-6 object-cover" alt="">
+          <img src="./assets/img/service3.webp" loading="lazy" class="w-28 h-24 rounded mr-6 object-cover" alt="layanan ketiga dari three brother law">
           <div>
-            <h3 class="text-lg font-semibold">Penanganan kasus kecelakaan.</h3>
-            <p class="text-gray-600">Memberikan dukungan hukum untuk kecelakaan lalu lintas, klaim kompensasi, atau masalah tanggung jawab.</p>
-            <a href="register.html" class="mt-2 px-3 py-1 border rounded hover:bg-gray-100">Klik Di Sini</a>
+            <h3 class="text-lg font-semibold">Kasus Kecelakaan</h3>
+            <p class="text-gray-600">Dukungan hukum untuk kecelakaan lalu lintas dan klaim kompensasi.</p>
+            <a href="register.php" class="mt-2 px-3 py-1 border rounded hover:bg-gray-100 inline-block">Klik Di Sini</a>
           </div>
         </div>
       </div>
@@ -141,35 +243,32 @@
   <!-- Testimony -->
   <section id="testimony" class="py-20 px-6 container mx-auto">
     <h2 class="text-2xl font-bold mb-3">Testimoni</h2>
-    <p class="mb-10 text-gray-600">Testimoni dari klien kami yang puas</p>
+    <p class="mb-10 text-gray-600">Dari klien kami yang puas</p>
     <div class="grid md:grid-cols-3 gap-6">
-      <!-- Card 1 -->
       <div class="bg-white rounded-xl shadow-md p-4 flex gap-4 items-start">
-        <img src="./assets/img/testimoni1.jpg" alt="Rudi" class="w-20 h-20 object-cover rounded-lg">
+        <img src="./assets/img/testimoni1.webp" loading="lazy" alt="testimoni dari Rudi" class="w-20 h-20 object-cover rounded-lg">
         <div>
           <h3 class="font-semibold text-lg mb-2">Rudi</h3>
           <p class="text-gray-700 text-sm">
-            Klien Three Brother Law menghargai profesionalisme firma dan bimbingan yang jelas dalam menangani sengketa, mencatat hasil yang menguntungkan dan ketenangan pikiran yang diperoleh dari dukungan ahli.
+            Profesional dan transparan, hasilnya memuaskan dan saya merasa terlindungi.
           </p>
         </div>
       </div>
-      <!-- Card 2 -->
       <div class="bg-white rounded-xl shadow-md p-4 flex gap-4 items-start">
-        <img src="./assets/img/testimoni2.png" alt="Bambang" class="w-20 h-20 object-cover rounded-lg">
+        <img src="./assets/img/testimoni2.webp" loading="lazy" alt="testimoni dari Bambang" class="w-20 h-20 object-cover rounded-lg">
         <div>
           <h3 class="font-semibold text-lg mb-2">Bambang</h3>
           <p class="text-gray-700 text-sm">
-            Klien memuji Three Brother Law untuk dukungan yang andal dalam kasus kecelakaan, menghargai keahlian firma, komunikasi yang jelas, dan komitmen untuk mengamankan kompensasi yang adil.
+            Komunikasi sangat baik, dan hasil kasus kecelakaan saya cepat terselesaikan.
           </p>
         </div>
       </div>
-      <!-- Card 3 -->
       <div class="bg-white rounded-xl shadow-md p-4 flex gap-4 items-start">
-        <img src="./assets/img/testimoni3.jpg" alt="Joko & Suwarni" class="w-20 h-20 object-cover rounded-lg">
+        <img src="./assets/img/testimoni3.webp" loading="lazy" alt="testimoni dari Joko & Suwarni" class="w-20 h-20 object-cover rounded-lg">
         <div>
           <h3 class="font-semibold text-lg mb-2">Joko & Suwarni</h3>
           <p class="text-gray-700 text-sm">
-            Klien mempercayai Three Brother Law dalam kasus perceraian untuk pendekatan yang penuh kasih, bimbingan yang jelas, dan strategi efektif untuk mencapai resolusi yang adil dan seimbang.
+            Pendekatan manusiawi dan hasilnya adil bagi kedua pihak. Terima kasih!
           </p>
         </div>
       </div>
@@ -182,29 +281,29 @@
       <div>
         <h2 class="text-2xl font-bold mb-6">Kontak Kami</h2>
         <p class="flex items-center mb-3"><i class="fa-solid fa-envelope mr-3"></i> threebrotherlaw@gmail.com</p>
-        <p class="flex items-start mb-3"><i class="fa-solid fa-location-dot mr-3 mt-1"></i> Jl. Sawunggaling II Desa.Sambisari, Kec. Taman, Kabupaten Sidoarjo, Jawa Timur 61257</p>
+        <p class="flex items-start mb-3"><i class="fa-solid fa-location-dot mr-3 mt-1"></i> Jl. Sawunggaling II, Desa Sambisari, Kec. Taman, Sidoarjo, Jawa Timur</p>
         <p class="flex items-center"><i class="fa-solid fa-phone mr-3"></i> +6282245059975</p>
       </div>
       <div>
         <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d989.2215837138733!2d112.67763246962419!3d-7.366635869504696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e3235b55cf8f%3A0xe8bf31edc869ea55!2sJl.%20Sawunggaling%20II%2C%20Jemundo%2C%20Kec.%20Taman%2C%20Kabupaten%20Sidoarjo%2C%20Jawa%20Timur%2061257!5e0!3m2!1sen!2sid!4v1757868667421!5m2!1sen!2sid" 
-          width="100%" 
-          height="300" 
+          data-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1240.391126453724!2d112.67763246962423!3d-7.366635869504696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e3235b55cf8f%3A0xe8bf31edc869ea55!2sJl.%20Sawunggaling%20II%2C%20Jemundo%2C%20Kec.%20Taman%2C%20Kabupaten%20Sidoarjo%2C%20Jawa%20Timur%2061257!5e1!3m2!1sid!2sid!4v1761707273012!5m2!1sid!2sid"
+          width="100%" height="300" 
           style="border:0;" 
           allowfullscreen="" 
-          loading="lazy"
-          class="rounded-xl">
+          loading="lazy" 
+          class="rounded-xl lazy-map">
         </iframe>
       </div>
     </div>
   </section>
+
 
   <!-- Footer -->
   <footer class="bg-gray-100 text-gray-800 py-12">
     <div class="container mx-auto grid md:grid-cols-4 gap-8 text-sm">
       <div>
         <div class="flex items-center mb-4">
-          <img src="./assets/img/logo.png" alt="Logo Three Brother Law" class="w-10 h-10 mr-3">
+          <img src="./assets/img/logo.webp" alt="Logo Three Brother Law" class="w-10 h-10 mr-3">
           <h3 class="font-bold text-xl">Three Brother Law</h3>
         </div>
         <p class="mb-4">Firma hukum profesional yang siap membantu menyelesaikan masalah hukum Anda dengan integritas dan keahlian.</p>
@@ -214,28 +313,31 @@
           <a href="https://wa.me/6289652003013" class="hover:text-gray-600"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
+
       <div>
         <h4 class="font-bold mb-4 text-lg">Layanan Kami</h4>
         <ul class="space-y-2">
-          <li class="hover:text-gray-600"><a href="#services">Hukum Perceraian</a></li>
-          <li class="hover:text-gray-600"><a href="#services">Sengketa Properti</a></li>
-          <li class="hover:text-gray-600"><a href="#services">Kasus Kecelakaan</a></li>
-          <li class="hover:text-gray-600"><a href="#services">Hukum Keluarga</a></li>
-          <li class="hover:text-gray-600"><a href="#services">Hukum Pidana</a></li>
-          <li class="hover:text-gray-600"><a href="#services">Hukum Bisnis</a></li>
+          <li><a href="#services" class="hover:text-gray-600">Hukum Perceraian</a></li>
+          <li><a href="#services" class="hover:text-gray-600">Sengketa Properti</a></li>
+          <li><a href="#services" class="hover:text-gray-600">Kasus Kecelakaan</a></li>
+          <li><a href="#services" class="hover:text-gray-600">Hukum Keluarga</a></li>
+          <li><a href="#services" class="hover:text-gray-600">Hukum Pidana</a></li>
+          <li><a href="#services" class="hover:text-gray-600">Hukum Bisnis</a></li>
         </ul>
       </div>
+
       <div>
         <h4 class="font-bold mb-4 text-lg">Tautan Cepat</h4>
         <ul class="space-y-2">
-          <li class="hover:text-gray-600"><a href="#about">Tentang Kami</a></li>
-          <li class="hover:text-gray-600"><a href="#services">Layanan</a></li>
-          <li class="hover:text-gray-600"><a href="#testimony">Testimoni</a></li>
-          <li class="hover:text-gray-600"><a href="#contact">Kontak</a></li>
-          <li class="hover:text-gray-600"><a href="login.html">Login</a></li>
-          <li class="hover:text-gray-600"><a href="register.html">Daftar</a></li>
+          <li><a href="#about" class="hover:text-gray-600">Tentang Kami</a></li>
+          <li><a href="#services" class="hover:text-gray-600">Layanan</a></li>
+          <li><a href="#testimony" class="hover:text-gray-600">Testimoni</a></li>
+          <li><a href="#contact" class="hover:text-gray-600">Kontak</a></li>
+          <li><a href="login.php" class="hover:text-gray-600">Login</a></li>
+          <li><a href="register.php" class="hover:text-gray-600">Daftar</a></li>
         </ul>
       </div>
+
       <div>
         <h4 class="font-bold mb-4 text-lg">Jam Operasional</h4>
         <ul class="space-y-2">
@@ -254,5 +356,37 @@
     </div>
   </footer>
 
+  <script defer>
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
+    let isOpen = false;
+
+    menuBtn.addEventListener('click', () => {
+      isOpen = !isOpen;
+      menu.style.transform = isOpen ? 'scaleY(1)' : 'scaleY(0)';
+      menuBtn.innerHTML = isOpen ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+    });
+  </script>
+
+  <script defer>
+  document.addEventListener("DOMContentLoaded", () => {
+    const maps = document.querySelectorAll(".lazy-map");
+    const options = { rootMargin: "200px 0px", threshold: 0 };
+
+    const loadMap = (entry) => {
+      const iframe = entry.target;
+      iframe.src = iframe.dataset.src;
+      observer.unobserve(iframe);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) loadMap(entry);
+      });
+    }, options);
+
+    maps.forEach(map => observer.observe(map));
+  });
+  </script>
 </body>
 </html>

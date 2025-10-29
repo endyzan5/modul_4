@@ -13,9 +13,17 @@ if ($_SESSION['role'] !== 'Administrator') {
     exit;
 }
 
-// Ambil seluruh data lawyer
-$stmt = $pdo->query("SELECT * FROM lawyers ORDER BY id DESC");
+// Ambil seluruh data lawyer beserta username dari tabel users (pakai LEFT JOIN supaya aman jika ada data yg belum punya user)
+$stmt = $pdo->query("
+  SELECT l.*, 
+         COALESCE(u.username, '') AS username,
+         COALESCE(u.email, l.email) AS display_email
+  FROM lawyers l
+  LEFT JOIN users u ON l.user_id = u.id
+  ORDER BY l.id DESC
+");
 $lawyers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +90,8 @@ $lawyers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <table class="w-full text-left">
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-6 py-3">#</th>
+              <th class="px-6 py-3">No</th>
+              <th class="px-6 py-3">Username</th>
               <th class="px-6 py-3">Full Name</th>
               <th class="px-6 py-3">Profession</th>
               <th class="px-6 py-3">Email</th>
@@ -95,6 +104,7 @@ $lawyers = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <?php foreach ($lawyers as $index => $lawyer): ?>
                 <tr class="border-b hover:bg-gray-50">
                   <td class="px-6 py-3"><?= $index + 1 ?></td>
+                  <td class="px-6 py-3"><?= htmlspecialchars($lawyer['username']) ?></td>
                   <td class="px-6 py-3"><?= htmlspecialchars($lawyer['full_name']) ?></td>
                   <td class="px-6 py-3"><?= htmlspecialchars($lawyer['profession']) ?></td>
                   <td class="px-6 py-3"><?= htmlspecialchars($lawyer['email']) ?></td>
@@ -113,7 +123,7 @@ $lawyers = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="6" class="text-center py-6 text-gray-500">No lawyer data found.</td>
+                <td colspan="7" class="text-center py-6 text-gray-500">No lawyer data found.</td>
               </tr>
             <?php endif; ?>
           </tbody>

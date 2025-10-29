@@ -1,0 +1,15 @@
+{
+  "name": "modul_4",
+  "version": "1.0.0",
+  "description": "repositori ini digunakan untuk menyimpan projek web Three Law Brother",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.10"
+  }
+}

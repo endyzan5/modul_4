@@ -10,18 +10,32 @@ if (!isset($_SESSION['username'])) {
 
 // Simpan data jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $lawyer = $_SESSION['username'];
+    $lawyer_username = $_SESSION['username'];
     $day = $_POST['day'];
     $start = $_POST['start'];
     $finished = $_POST['finished'];
 
-    $sql = "INSERT INTO lawyer_schedule (lawyer_username, day, start_time, end_time)
-            VALUES (:lawyer, :day, :start, :finished)";
+    // Ambil lawyer_id berdasarkan username
+    $stmt = $pdo->prepare("SELECT id FROM lawyers WHERE user_id = (SELECT id FROM users WHERE username = :username)");
+    $stmt->execute([':username' => $lawyer_username]);
+    $lawyer = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$lawyer) {
+        echo "<script>alert('Data lawyer tidak ditemukan!');</script>";
+        exit;
+    }
+
+    $lawyer_id = $lawyer['id'];
+
+    // Simpan ke tabel lawyer_schedule
+    $sql = "INSERT INTO lawyer_schedule (lawyer_id, lawyer_username, day, start_time, end_time)
+            VALUES (:lawyer_id, :lawyer_username, :day, :start, :finished)";
     $stmt = $pdo->prepare($sql);
 
     try {
         $stmt->execute([
-            ':lawyer' => $lawyer,
+            ':lawyer_id' => $lawyer_id,
+            ':lawyer_username' => $lawyer_username,
             ':day' => $day,
             ':start' => $start,
             ':finished' => $finished
@@ -31,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<script>alert('Gagal menambahkan jadwal: " . $e->getMessage() . "');</script>";
     }
 }
+
 ?>
 
 

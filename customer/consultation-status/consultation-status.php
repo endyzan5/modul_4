@@ -2,7 +2,7 @@
 session_start();
 require_once '../../config.php';
 
-// Cek apakah sudah login dan role adalah Customer
+// Cek login dan role Customer
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Customer') {
     header("Location: ../login.php");
     exit;
@@ -10,12 +10,15 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Customer') {
 
 // Ambil data konsultasi berdasarkan nama customer yang login
 $customerName = $_SESSION['username'];
-$stmt = $pdo->prepare("SELECT lawyer_name, profession, day, time, status 
+$stmt = $pdo->prepare("SELECT id, lawyer_name, profession, day, time, status 
                        FROM consultation_schedule 
                        WHERE customer_name = :customer_name 
                        ORDER BY created_at DESC");
 $stmt->execute(['customer_name' => $customerName]);
 $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Cek apakah ada pesan sukses
+$success = isset($_GET['success']) ? $_GET['success'] : null;
 ?>
 
 <!DOCTYPE html>
@@ -66,22 +69,32 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <main class="flex-1 p-12">
       <h1 class="text-3xl font-bold mb-8">Consultation Status</h1>
 
+      <!-- Alert Success -->
+      <?php if ($success): ?>
+        <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+          ✅ <?= htmlspecialchars($success) ?>
+        </div>
+      <?php endif; ?>
+
       <!-- Table Card -->
       <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-gray-200 text-gray-700">
+              <th class="px-6 py-3">No</th>
               <th class="px-6 py-3">Lawyer Name</th>
               <th class="px-6 py-3">Profession</th>
               <th class="px-6 py-3">Day</th>
               <th class="px-6 py-3">Time</th>
               <th class="px-6 py-3">Status</th>
+              <th class="px-6 py-3">Aksi</th>
             </tr>
           </thead>
           <tbody>
             <?php if (count($consultations) > 0): ?>
-              <?php foreach ($consultations as $row): ?>
-                <tr class="border-t">
+              <?php foreach ($consultations as $index => $row): ?>
+                <tr class="border-t hover:bg-gray-50">
+                  <td class="px-6 py-4"><?= $index + 1 ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['lawyer_name']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['profession']) ?></td>
                   <td class="px-6 py-4"><?= htmlspecialchars($row['day']) ?></td>
@@ -92,18 +105,35 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                       $color = match($status) {
                           'Accepted' => 'bg-green-500',
                           'Rejected' => 'bg-red-500',
-                          default => 'bg-gray-600'
+                          'Cancelled' => 'bg-gray-500',
+                          default => 'bg-yellow-500'
                       };
                     ?>
                     <span class="px-3 py-1 rounded-md text-white text-sm <?= $color ?>">
                       <?= htmlspecialchars($status) ?>
                     </span>
                   </td>
+                  <td class="px-6 py-4">
+                    <?php if ($row['status'] === 'Pending'): ?>
+                      <form action="cancel_consultation.php" method="POST" 
+                            onsubmit="return confirm('Apakah Anda yakin ingin membatalkan konsultasi ini?');">
+                        <input type="hidden" name="consultation_id" value="<?= htmlspecialchars($row['id']) ?>">
+                        <button type="submit" 
+                                class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">
+                          Cancel
+                        </button>
+                      </form>
+                    <?php else: ?>
+                      <button class="px-3 py-1 bg-gray-400 text-white rounded-md cursor-not-allowed" disabled>
+                        Cancel
+                      </button>
+                    <?php endif; ?>
+                  </td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No consultation records found.</td>
+                <td colspan="7" class="px-6 py-4 text-center text-gray-500">No consultation records found.</td>
               </tr>
             <?php endif; ?>
           </tbody>
